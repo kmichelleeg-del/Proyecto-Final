@@ -424,7 +424,7 @@ public class ServidorWeb {
                     <style>
                         :root {
                             --verde: #009444;
-                            --dorado: #d79b27;
+                            --dorado: #32720b;
                             --gris: #5d7079;
                             --fondo: #eef1f2;
                         }
@@ -437,7 +437,7 @@ public class ServidorWeb {
                             margin: 0;
                             font-family: Arial, sans-serif;
                             background: var(--fondo);
-                            color: #263238;
+                            color: #485054;
                         }
 
                         header {

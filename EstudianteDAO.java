@@ -129,4 +129,32 @@ public class EstudianteDAO {
             return consulta.executeUpdate() > 0;
         }
     }
+        public Estudiante buscarPorCarne(String carne) throws SQLException {
+        String sql =
+                "SELECT id, nombre, correo, carne, estado "
+                + "FROM estudiantes WHERE carne = ?";
+
+        try (
+                Connection conexion = DriverManager.getConnection(URL);
+                PreparedStatement consulta = conexion.prepareStatement(sql)
+        ) {
+            consulta.setString(1, carne.trim());
+
+            try (ResultSet resultado = consulta.executeQuery()) {
+                if (resultado.next()) {
+                    return new Estudiante(
+                            resultado.getInt("id"),
+                            resultado.getString("nombre"),
+                            resultado.getString("correo"),
+                            resultado.getString("carne"),
+                            EstadoMiembro.valueOf(
+                                    resultado.getString("estado")
+                            )
+                    );
+                }
+            }
+        }
+
+        return null;
+    }
 }

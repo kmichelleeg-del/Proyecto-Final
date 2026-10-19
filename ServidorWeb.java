@@ -1,6 +1,5 @@
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
@@ -76,6 +75,53 @@ public class ServidorWeb {
                     && metodo.equals("GET")
             ) {
                 mostrarInicio(intercambio);
+
+                        } else if (
+                    ruta.equals("/miembro")
+                    && metodo.equals("GET")
+            ) {
+                enviar(
+                        intercambio,
+                        200,
+                        VistaMiembro.renderizar(
+                                controlador.obtenerActividades()
+                        )
+                );
+
+            } else if (
+                    ruta.equals("/miembro")
+                    && metodo.equals("POST")
+            ) {
+                Map<String, String> datos = leerFormulario(intercambio);
+                String carne = datos.getOrDefault("carne", "").trim();
+
+                Estudiante miembro = null;
+                String mensaje = "";
+
+                if (carne.isBlank()) {
+                    mensaje = "Ingresa tu carné para consultar tu estado.";
+                } else {
+                    miembro = controlador.buscarMiembroPorCarne(carne);
+
+                    if (miembro == null) {
+                        mensaje = "No encontramos un miembro con ese carné.";
+                    }
+                }
+
+                intercambio.getResponseHeaders().set(
+                        "Cache-Control",
+                        "no-store"
+                );
+
+                enviar(
+                        intercambio,
+                        200,
+                        VistaMiembro.renderizar(
+                                controlador.obtenerActividades(),
+                                miembro,
+                                mensaje
+                        )
+                );
 
             } else if (
                     ruta.equals("/uvglog.png")

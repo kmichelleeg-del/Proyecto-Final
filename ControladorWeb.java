@@ -90,4 +90,16 @@ public class ControladorWeb {
 
         return actividadDAO.eliminar(actividadId);
     }
+
+        public Estudiante buscarMiembroPorCarne(String carne)
+            throws SQLException {
+
+        if (carne == null || carne.isBlank()) {
+            throw new IllegalArgumentException(
+                    "Ingresa tu carné para consultar tu estado."
+            );
+        }
+
+        return estudianteDAO.buscarPorCarne(carne.trim());
+    }
 }

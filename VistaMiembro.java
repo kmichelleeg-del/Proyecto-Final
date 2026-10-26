@@ -55,19 +55,10 @@ public class VistaMiembro {
         }
 
         return CABECERA
-                + "<section class='bienvenida'>"
-                + "<span>ESPACIO DEL MIEMBRO</span>"
-                + "<h1>Actividades del club</h1>"
-                + "<p>Consulta las actividades "
-                + "publicadas por el encargado del club.</p>"
-                + "<a class='boton' href='#proximas'>"
-                + "Ver actividades</a></section>"
-
                 + "<div class='resumen'><strong>"
                 + cantidadProximas
                 + "</strong> próximas actividades"
-                + "<span>Información del club</span></div>"
-                
+                + "</div>"                
                 + crearConsultaMiembro(miembro, mensaje)
                 + "<section id='proximas'>"
                 + "<div class='titulo'><h2>Próximas actividades</h2>"
@@ -84,8 +75,8 @@ public class VistaMiembro {
                 + "<div class='tarjetas'>" + anteriores + "</div>"
                 + "</section></main>"
 
-                + "<footer>Universidad del Valle de Guatemala "
-                + "· Gestión de clubes</footer>"
+                + "<footer>Programación Orientada a Objetos Kathy y Abril"
+                + "</footer>"
                 + "</body></html>";
     }
     
@@ -94,27 +85,14 @@ public class VistaMiembro {
             String mensaje
     ) {
         String contenido =
-                "<section class='tarjeta' style='margin-bottom:30px'>"
-                + "<h2>Mi estado en el club</h2>"
-                + "<p>Ingresa tu carné para consultar tu estado actual.</p>"
-                + "<form action='/miembro' method='post'>"
-                + "<label for='carne'>Carné del estudiante</label>"
-                + "<div style='display:flex;gap:12px;"
-                + "flex-wrap:wrap;margin-top:10px'>"
-                + "<input id='carne' name='carne' type='text' "
-                + "placeholder='Escribe tu carné' required "
-                + "value='"
-                + (miembro == null ? "" : escapar(miembro.getCarne()))
-                + "' style='padding:12px;border:1px solid #b9cbb5;"
-                + "border-radius:8px;font:inherit;max-width:100%'>"
-                + "<button type='submit' class='boton' "
-                + "style='margin:0;border:0;cursor:pointer;font:inherit'>"
-                + "Consultar estado</button>"
-                + "</div></form>";
+                "<section>"
+                + "<h2>Mis datos</h2>";
 
         if (mensaje != null && !mensaje.isBlank()) {
             contenido +=
-                    "<p role='status'>" + escapar(mensaje) + "</p>";
+                    "<p role='status'>"
+                    + escapar(mensaje)
+                    + "</p>";
         }
 
         if (miembro != null) {
@@ -127,22 +105,21 @@ public class VistaMiembro {
             };
 
             contenido +=
-                    "<div role='status' style='margin-top:20px;"
-                    + "padding:18px;background:#edf3e4;border-radius:10px'>"
-                    + "<p><strong>Nombre:</strong> "
+                    "<p><strong>Nombre:</strong> "
                     + escapar(miembro.getNombre()) + "</p>"
                     + "<p><strong>Carné:</strong> "
                     + escapar(miembro.getCarne()) + "</p>"
-                    + "<p><strong>Estado actual:</strong> "
-                    + estado + "</p>"
-                    + "</div>"
-                    + "<p>Si el coordinador cambia tu estado, "
-                    + "presiona Consultar estado para ver el cambio.</p>";
+                    + "<p><strong>Estado en el club:</strong> "
+                    + estado + "</p>";
         }
 
-        return contenido + "</section>";
-    }
+        contenido +=
+                "<a class='boton' href='/miembro'>"
+                + "Actualizar mis datos</a>"
+                + "</section>";
 
+        return contenido;
+    }
     private static String crearTarjeta(Actividad actividad) {
         LocalDateTime fecha = actividad.getFechaHora();
 
@@ -202,226 +179,243 @@ public class VistaMiembro {
 
                 body {
                     margin: 0;
-                    font-family: 'Segoe UI', Arial, sans-serif;
-                    background: #f4f6f0;
-                    color: #234333;
+                    color: #263238;
+                    font-family: 'Times New Roman', Times, serif;
+                    background: #eef1f2;
                 }
 
                 header {
-                    background: white;
-                    border-bottom: 1px solid #dce5d8;
+                    padding: 30px 20px;
+                    color: white;
+                    text-align: center;
+                    background: #33915f;
+                    border-bottom: 8px solid #4d712c;
                 }
 
                 nav {
-                    max-width: 1100px;
+                    max-width: 900px;
                     margin: auto;
-                    padding: 20px 24px;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    gap: 16px;
                 }
 
                 .marca {
-                    font-size: 22px;
+                    font-size: 32px;
                     font-weight: bold;
                 }
 
                 .marca small {
                     display: block;
-                    font-size: 11px;
+                    margin-top: 16px;
+                    font-size: 16px;
                     font-weight: normal;
-                    margin-top: 4px;
-                }
-
-                a {
-                    color: #245b3e;
-                }
-
-                nav a {
-                    font-size: 14px;
                 }
 
                 main {
-                    max-width: 1100px;
-                    margin: auto;
-                    padding: 30px 24px 60px;
+                    max-width: 900px;
+                    margin: 30px auto;
+                    padding: 0 20px;
+                }
+
+                section {
+                    margin-bottom: 24px;
+                    padding: 24px;
+                    background: white;
+                    border-left: 6px solid #165422;
+                    border-radius: 12px;
+                    box-shadow: 0 3px 12px #1970327a;
+                }
+
+                h1,
+                h2,
+                h3 {
+                    color: #165422;
+                }
+
+                h1,
+                h2 {
+                    margin-top: 0;
+                    font-size: 24px;
+                }
+
+                h3 {
+                    margin: 16px 0;
+                    font-size: 20px;
+                }
+
+                p {
+                    line-height: 1.5;
                 }
 
                 .bienvenida {
-                    background: #174d37;
-                    color: white;
-                    padding: 30px;
-                    border-radius: 22px;
+                    text-align: center;
+                    border-left-color: #4d712c;
                 }
 
                 .bienvenida span {
-                    color: #d4e9ae;
-                    font-size: 12px;
-                    letter-spacing: 2px;
+                    color: #165422;
+                    font-size: 14px;
                 }
 
-                h1 {
-                    font-size: 32px;
-                    line-height: 1.1;
-                    margin: 20px 0;
+                .bienvenida h1 {
+                    margin-top: 12px;
                 }
 
-                .bienvenida p {
-                    color: #e0eadf;
-                    line-height: 1.6;
-                }
-
-                .boton {
+                .boton,
+                button {
                     display: inline-block;
-                    background: #d4e9ae;
-                    padding: 14px 20px;
-                    margin-top: 14px;
-                    border-radius: 9px;
-                    text-decoration: none;
+                    padding: 11px 18px;
+                    color: white;
+                    font-family: Arial, sans-serif;
+                    font-size: 16px;
                     font-weight: bold;
+                    text-decoration: none;
+                    background: #33915f;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                }
+
+                .boton:hover,
+                button:hover {
+                    background: #165422;
+                }
+
+                .cerrar-sesion {
+                    margin-top: 18px;
+                    background: #165422;
+                }
+
+                .cerrar-sesion:hover {
+                    background: #103c19;
                 }
 
                 .resumen {
+                    margin-bottom: 24px;
+                    padding: 16px 24px;
+                    color: #165422;
                     background: white;
-                    border: 1px solid #dce5d8;
-                    border-radius: 12px;
-                    padding: 22px;
-                    margin: 22px 0 40px;
+                    border-left: 6px solid #4d712c;
+                    border-radius: 8px;
                 }
 
                 .resumen strong {
-                    font-size: 26px;
-                    margin-right: 8px;
-                }
-
-                .resumen span {
-                    float: right;
-                    color: #627366;
-                    padding-top: 8px;
+                    font-size: 20px;
                 }
 
                 .titulo {
                     display: flex;
-                    align-items: center;
                     justify-content: space-between;
+                    align-items: center;
                     gap: 16px;
                 }
 
-                h2 {
-                    font-size: 27px;
-                    margin: 0;
+                .titulo h2 {
+                    margin-bottom: 0;
+                }
+
+                .titulo a {
+                    color: #165422;
                 }
 
                 .descripcion {
-                    color: #627366;
-                    line-height: 1.5;
-                    margin-bottom: 24px;
+                    margin-bottom: 20px;
                 }
 
                 .tarjetas {
                     display: grid;
-                    grid-template-columns: repeat(3, minmax(0, 1fr));
-                    gap: 20px;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 16px;
                 }
 
                 .tarjeta {
+                    padding: 20px;
                     background: white;
-                    border: 1px solid #dce5d8;
-                    border-radius: 16px;
-                    padding: 25px;
+                    border: 1px solid #b8c1c5;
+                    border-radius: 8px;
                     overflow-wrap: anywhere;
+                }
+
+                section.tarjeta {
+                    border-left: 6px solid #165422;
+                    border-radius: 12px;
                 }
 
                 .etiqueta {
                     display: inline-block;
-                    background: #edf3e4;
-                    color: #366037;
-                    padding: 7px 12px;
-                    border-radius: 20px;
-                    font-size: 12px;
-                }
-
-                h3 {
-                    font-size: 22px;
-                    margin: 22px 0;
-                }
-
-                .tarjeta p {
-                    color: #526859;
+                    padding: 5px 10px;
+                    color: #165422;
+                    background: #eef1f2;
+                    border-radius: 4px;
                     font-size: 14px;
-                    line-height: 1.6;
                 }
 
                 details {
-                    border-top: 1px solid #e4e9df;
-                    margin-top: 22px;
-                    padding-top: 16px;
+                    margin-top: 16px;
+                    padding-top: 12px;
+                    border-top: 1px solid #b8c1c5;
                 }
 
                 summary {
+                    color: #165422;
+                    font-weight: bold;
                     cursor: pointer;
-                    font-size: 14px;
+                }
+
+                label {
+                    display: block;
+                    margin-top: 10px;
+                    color: #165422;
                     font-weight: bold;
                 }
 
-                .historial {
-                    margin-top: 45px;
+                input {
+                    padding: 11px;
+                    font-size: 16px;
+                    border: 1px solid #b8c1c5;
+                    border-radius: 6px;
+                }
+
+                input:focus {
+                    outline: 2px solid #33915f;
+                    border-color: #33915f;
                 }
 
                 .vacio {
                     grid-column: 1 / -1;
-                    border: 1px dashed #b9cbb5;
-                    border-radius: 12px;
-                    padding: 35px;
+                    padding: 20px;
                     text-align: center;
-                    color: #627366;
+                    background: #eef1f2;
+                    border-radius: 6px;
                 }
 
                 footer {
+                    padding: 22px;
+                    color: white;
                     text-align: center;
-                    padding: 24px;
-                    border-top: 1px solid #dce5d8;
-                    color: #627366;
-                    font-size: 12px;
+                    background: #165422;
                 }
 
                 :focus-visible {
-                    outline: 3px solid #ae791b;
-                    outline-offset: 4px;
-                }
-
-                @media (max-width: 850px) {
-                    .tarjetas {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                    }
+                    outline: 2px solid #165422;
+                    outline-offset: 3px;
                 }
 
                 @media (max-width: 600px) {
                     main {
-                        padding: 20px 16px 40px;
+                        margin: 15px auto;
+                        padding: 0 12px;
                     }
 
-                    .bienvenida {
-                        padding: 28px;
+                    section {
+                        padding: 18px;
                     }
 
                     .tarjetas {
                         grid-template-columns: 1fr;
                     }
 
-                    .resumen span {
-                        float: none;
-                        display: block;
-                        margin-top: 8px;
-                    }
-
                     .titulo {
-                        align-items: start;
-                    }
-
-                    h2 {
-                        font-size: 23px;
+                        align-items: flex-start;
+                        flex-direction: column;
                     }
                 }
             </style>
@@ -430,10 +424,16 @@ public class VistaMiembro {
         <body>
             <header>
                 <nav>
-                    <div class="marca">
-                        Mi club
-                        <small>Universidad del Valle de Guatemala</small>
-                    </div>
+                <div class="marca">
+                    Voces del Valle
+                    <small>Universidad del Valle de Guatemala</small>
+                </div>
+
+                <form action="/logout" method="post">
+                    <button type="submit" class="cerrar-sesion">
+                        Cerrar sesión
+                    </button>
+                </form>
                 </nav>
             </header>
 

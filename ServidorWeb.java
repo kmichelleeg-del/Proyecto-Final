@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ServidorWeb {
-
+    private static final Sesiones sesiones = new Sesiones();
     private static final ControladorWeb controlador =
             new ControladorWeb();
 
@@ -70,6 +70,9 @@ public class ServidorWeb {
                 intercambio.getRequestMethod();
 
         try {
+            if (controlarAcceso(intercambio, ruta, metodo)) {
+                return;
+            }      
             if (
                     ruta.equals("/")
                     && metodo.equals("GET")
@@ -963,5 +966,264 @@ public class ServidorWeb {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+        private static String obtenerCodigoSesion(
+            HttpExchange intercambio
+    ) {
+        String cookies = intercambio.getRequestHeaders()
+                .getFirst("Cookie");
+
+        if (cookies == null) {
+            return null;
+        }
+
+        for (String cookie : cookies.split(";")) {
+            String[] partes = cookie.trim().split("=", 2);
+
+            if (partes.length == 2
+                    && partes[0].equals("SESION")) {
+
+                return partes[1];
+            }
+        }
+
+        return null;
+    }
+
+    private static void redirigir(
+            HttpExchange intercambio,
+            String destino
+    ) throws IOException {
+
+        intercambio.getResponseHeaders().set(
+                "Location",
+                destino
+        );
+
+        intercambio.getResponseHeaders().set(
+                "Cache-Control",
+                "no-store"
+        );
+
+        intercambio.sendResponseHeaders(303, -1);
+        intercambio.close();
+    }
+
+        private static boolean controlarAcceso(
+            HttpExchange intercambio,
+            String ruta,
+            String metodo
+    ) throws Exception {
+
+        intercambio.getResponseHeaders().set(
+                "Cache-Control",
+                "no-store"
+        );
+
+        String codigo = obtenerCodigoSesion(intercambio);
+        Cuenta cuenta = sesiones.obtenerCuenta(codigo);
+
+        if (ruta.equals("/login") && metodo.equals("GET")) {
+            if (cuenta == null) {
+                enviar(intercambio, 200, VistaLogin.renderizar(""));
+            } else {
+                redirigir(
+                        intercambio,
+                        cuenta.esCoordinador() ? "/" : "/miembro"
+                );
+            }
+
+            return true;
+        }
+
+        if (ruta.equals("/login") && metodo.equals("POST")) {
+            procesarLogin(intercambio);
+            return true;
+        }
+
+        if (cuenta == null) {
+            redirigir(intercambio, "/login");
+            return true;
+        }
+
+        if (ruta.equals("/logout") && metodo.equals("POST")) {
+            sesiones.cerrar(codigo);
+
+            intercambio.getResponseHeaders().add(
+                    "Set-Cookie",
+                    "SESION=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0"
+            );
+
+            redirigir(intercambio, "/login");
+            return true;
+        }
+
+        if (ruta.equals("/uvglog.png") && metodo.equals("GET")) {
+            return false;
+        }
+
+        if (!cuenta.esCoordinador()) {
+            if (ruta.equals("/miembro")
+                    && (metodo.equals("GET") || metodo.equals("POST"))) {
+
+                Estudiante miembro =
+                        controlador.buscarMiembroPorCarne(
+                                cuenta.getCarne()
+                        );
+
+                String mensaje = "";
+
+                if (miembro == null) {
+                    mensaje =
+                            "No encontramos el registro asociado a tu cuenta. "
+                            + "Consulta con el coordinador.";
+                }
+
+                enviar(
+                        intercambio,
+                        200,
+                        VistaMiembro.renderizar(
+                                controlador.obtenerActividades(),
+                                miembro,
+                                mensaje
+                        )
+                );
+
+                return true;
+            }
+
+            if (ruta.equals("/") && metodo.equals("GET")) {
+                redirigir(intercambio, "/miembro");
+                return true;
+            }
+
+            enviar(
+                    intercambio,
+                    403,
+                    "<h1>Acceso no permitido</h1>"
+                    + "<p>Tu cuenta no tiene permiso para esta acción.</p>"
+                    + "<a href='/miembro'>Volver a mi vista</a>"
+            );
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static void procesarLogin(
+            HttpExchange intercambio
+    ) throws Exception {
+
+        byte[] contenido = intercambio.getRequestBody().readNBytes(8193);
+
+        if (contenido.length > 8192) {
+            enviar(
+                    intercambio,
+                    413,
+                    VistaLogin.renderizar(
+                            "Los datos ingresados son demasiado largos."
+                    )
+            );
+            return;
+        }
+
+        String cuerpo = new String(
+                contenido,
+                StandardCharsets.UTF_8
+        );
+
+        Map<String, String> datos = new HashMap<>();
+
+        try {
+            for (String campo : cuerpo.split("&")) {
+                String[] partes = campo.split("=", 2);
+
+                if (partes.length == 2) {
+                    String nombre = URLDecoder.decode(
+                            partes[0],
+                            StandardCharsets.UTF_8
+                    );
+
+                    String valor = URLDecoder.decode(
+                            partes[1],
+                            StandardCharsets.UTF_8
+                    );
+
+                    datos.put(nombre, valor);
+                }
+            }
+
+        } catch (IllegalArgumentException error) {
+            enviar(
+                    intercambio,
+                    400,
+                    VistaLogin.renderizar(
+                            "No se pudieron leer los datos del formulario."
+                    )
+            );
+            return;
+        }
+
+        String usuario = datos.getOrDefault("usuario", "");
+        char[] contrasena = datos.getOrDefault(
+                "contrasena",
+                ""
+        ).toCharArray();
+
+        Cuenta cuenta;
+
+        try {
+            Autenticacion autenticacion = new Autenticacion();
+
+            cuenta = autenticacion.iniciarSesion(
+                    usuario,
+                    contrasena
+            );
+
+        } catch (IOException | java.security.GeneralSecurityException error) {
+            error.printStackTrace();
+
+            enviar(
+                    intercambio,
+                    500,
+                    VistaLogin.renderizar(
+                            "No se pudo iniciar sesión. "
+                            + "Consulta con el encargado del sistema."
+                    )
+            );
+
+            return;
+
+        } finally {
+            java.util.Arrays.fill(contrasena, '\0');
+        }
+
+        if (cuenta == null) {
+            enviar(
+                    intercambio,
+                    401,
+                    VistaLogin.renderizar(
+                            "Usuario o contraseña incorrectos."
+                    )
+            );
+            return;
+        }
+
+        sesiones.cerrar(obtenerCodigoSesion(intercambio));
+
+        String nuevoCodigo = sesiones.crear(cuenta);
+
+        intercambio.getResponseHeaders().add(
+                "Set-Cookie",
+                "SESION=" + nuevoCodigo
+                + "; Path=/; HttpOnly; SameSite=Strict; Max-Age=1800"
+        );
+
+        redirigir(
+                intercambio,
+                cuenta.esCoordinador() ? "/" : "/miembro"
+        );
     }
 }

@@ -104,14 +104,26 @@ public class VistaMiembro {
                 case RETIRADO -> "Retirado";
             };
 
+            String explicacion = switch (miembro.getEstado()) {
+                case ACTIVO ->
+                        "Actualmente participas como miembro del club.";
+                case INACTIVO ->
+                        "Tu participación en el club está pausada por el momento.";
+                case PENDIENTE_CONFIRMACION ->
+                        "Está pendiente confirmar tu continuidad en el club.";
+                case RETIRADO ->
+                        "Ya no participas como miembro del club.";
+            };
+
             contenido +=
                     "<p><strong>Nombre:</strong> "
                     + escapar(miembro.getNombre()) + "</p>"
                     + "<p><strong>Carné:</strong> "
                     + escapar(miembro.getCarne()) + "</p>"
                     + "<p><strong>Estado en el club:</strong> "
-                    + estado + "</p>";
-        }
+                    + estado + "</p>"
+                    + "<p class='explicacion-estado'>"
+                    + explicacion + "</p>";        }
 
         contenido +=
                 "<a class='boton' href='/miembro'>"
@@ -181,15 +193,15 @@ public class VistaMiembro {
                     margin: 0;
                     color: #263238;
                     font-family: 'Times New Roman', Times, serif;
-                    background: #eef1f2;
+                    background: #f2f5f3;
                 }
 
                 header {
                     padding: 30px 20px;
                     color: white;
                     text-align: center;
-                    background: #33915f;
-                    border-bottom: 8px solid #4d712c;
+                    background: #28734f;
+                    border-bottom: 8px solid #dce9df;
                 }
 
                 nav {
@@ -219,15 +231,15 @@ public class VistaMiembro {
                     margin-bottom: 24px;
                     padding: 24px;
                     background: white;
-                    border-left: 6px solid #165422;
+                    border-left: 6px solid #184d35;
                     border-radius: 12px;
-                    box-shadow: 0 3px 12px #1970327a;
+                    box-shadow: 0 3px 12px #184d3526;
                 }
 
                 h1,
                 h2,
                 h3 {
-                    color: #165422;
+                    color: #184d35;
                 }
 
                 h1,
@@ -247,11 +259,11 @@ public class VistaMiembro {
 
                 .bienvenida {
                     text-align: center;
-                    border-left-color: #4d712c;
+                    border-left-color: #dce9df;
                 }
 
                 .bienvenida span {
-                    color: #165422;
+                    color: #184d35;
                     font-size: 14px;
                 }
 
@@ -268,7 +280,7 @@ public class VistaMiembro {
                     font-size: 16px;
                     font-weight: bold;
                     text-decoration: none;
-                    background: #33915f;
+                    background: #28734f;
                     border: none;
                     border-radius: 6px;
                     cursor: pointer;
@@ -276,12 +288,12 @@ public class VistaMiembro {
 
                 .boton:hover,
                 button:hover {
-                    background: #165422;
+                    background: #184d35;
                 }
 
                 .cerrar-sesion {
                     margin-top: 18px;
-                    background: #165422;
+                    background: #184d35;
                 }
 
                 .cerrar-sesion:hover {
@@ -291,9 +303,9 @@ public class VistaMiembro {
                 .resumen {
                     margin-bottom: 24px;
                     padding: 16px 24px;
-                    color: #165422;
+                    color: #184d35;
                     background: white;
-                    border-left: 6px solid #4d712c;
+                    border-left: 6px solid #dce9df;
                     border-radius: 8px;
                 }
 
@@ -313,7 +325,7 @@ public class VistaMiembro {
                 }
 
                 .titulo a {
-                    color: #165422;
+                    color: #184d35;
                 }
 
                 .descripcion {
@@ -335,15 +347,15 @@ public class VistaMiembro {
                 }
 
                 section.tarjeta {
-                    border-left: 6px solid #165422;
+                    border-left: 6px solid #184d35;
                     border-radius: 12px;
                 }
 
                 .etiqueta {
                     display: inline-block;
                     padding: 5px 10px;
-                    color: #165422;
-                    background: #eef1f2;
+                    color: #184d35;
+                    background: #f2f5f3;
                     border-radius: 4px;
                     font-size: 14px;
                 }
@@ -355,7 +367,7 @@ public class VistaMiembro {
                 }
 
                 summary {
-                    color: #165422;
+                    color: #184d35;
                     font-weight: bold;
                     cursor: pointer;
                 }
@@ -363,7 +375,7 @@ public class VistaMiembro {
                 label {
                     display: block;
                     margin-top: 10px;
-                    color: #165422;
+                    color: #184d35;
                     font-weight: bold;
                 }
 
@@ -375,15 +387,15 @@ public class VistaMiembro {
                 }
 
                 input:focus {
-                    outline: 2px solid #33915f;
-                    border-color: #33915f;
+                    outline: 2px solid #28734f;
+                    border-color: #28734f;
                 }
 
                 .vacio {
                     grid-column: 1 / -1;
                     padding: 20px;
                     text-align: center;
-                    background: #eef1f2;
+                    background: #f2f5f3;
                     border-radius: 6px;
                 }
 
@@ -391,11 +403,11 @@ public class VistaMiembro {
                     padding: 22px;
                     color: white;
                     text-align: center;
-                    background: #165422;
+                    background: #184d35;
                 }
 
                 :focus-visible {
-                    outline: 2px solid #165422;
+                    outline: 2px solid #184d35;
                     outline-offset: 3px;
                 }
 
@@ -418,7 +430,17 @@ public class VistaMiembro {
                         flex-direction: column;
                     }
                 }
-            </style>
+
+                .explicacion-estado {
+                    margin: 12px 0 20px;
+                    padding: 14px 16px;
+                    color: #184d35;
+                    background: #dce9df;
+                    border-left: 4px solid #28734f;
+                    border-radius: 6px;
+                    line-height: 1.5;
+                }
+            </style>   
         </head>
 
         <body>

@@ -38,7 +38,7 @@ public class VistaLogin {
                 body {
                     margin: 0;
                     font-family: 'Times New Roman', Times, serif;
-                    background: #eef1f2;
+                    background: #f2f5f3;
                     color: #263238;
                 }
 
@@ -46,8 +46,8 @@ public class VistaLogin {
                     padding: 30px 20px;
                     text-align: center;
                     color: white;
-                    background: #33915f;
-                    border-bottom: 8px solid #4d712c;
+                    background: #28734f;
+                    border-bottom: 8px solid #dce9df;
                 }
 
                 header h1 {
@@ -67,20 +67,20 @@ public class VistaLogin {
                 section {
                     padding: 28px;
                     background: white;
-                    border-left: 6px solid #165422;
+                    border-left: 6px solid #184d35;
                     border-radius: 12px;
-                    box-shadow: 0 3px 12px #1970327a;
+                    box-shadow: 0 3px 12px #184d3526;
                 }
 
                 h2 {
                     margin-top: 0;
-                    color: #165422;
+                    color: #184d35;
                 }
 
                 label {
                     display: block;
                     margin-top: 16px;
-                    color: #165422;
+                    color: #184d35;
                     font-weight: bold;
                 }
 
@@ -98,25 +98,25 @@ public class VistaLogin {
                 }
 
                 input:focus {
-                    outline: 2px solid #33915f;
-                    border-color: #33915f;
+                    outline: 2px solid #28734f;
+                    border-color: #28734f;
                 }
 
                 button {
                     margin-top: 24px;
                     border: none;
-                    background: #33915f;
+                    background: #184d35;
                     color: white;
                     font-weight: bold;
                     cursor: pointer;
                 }
 
                 button:hover {
-                    background: #165422;
+                    background: #184d35;
                 }
 
                 button:focus-visible {
-                    outline: 3px solid #165422;
+                    outline: 3px solid #184d35;
                     outline-offset: 3px;
                 }
 
@@ -130,8 +130,28 @@ public class VistaLogin {
                 footer {
                     padding: 22px;
                     text-align: center;
-                    color: #165422;
+                    color: #184d35;
                 }
+                    .mascota-login {
+                        position: fixed;
+                        right: 24px;
+                        bottom: 0;
+                        width: 220px;
+                        max-height: 55vh;
+                        object-fit: contain;
+                        object-position: bottom;
+                        pointer-events: none;
+                    }
+
+                    @media (max-width: 1000px) {
+                        .mascota-login {
+                            position: static;
+                            display: block;
+                            width: 160px;
+                            max-height: none;
+                            margin: 20px auto 0;
+                        }
+                    }
             </style>
         </head>
 
@@ -172,6 +192,11 @@ public class VistaLogin {
                     </form>
                 </section>
             </main>
+            <img
+                src="/mascota.png"
+                class="mascota-login"
+                alt="Mascota de Voces del Valle"
+            >
         </body>
         </html>
         """;

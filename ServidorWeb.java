@@ -70,6 +70,13 @@ public class ServidorWeb {
                 intercambio.getRequestMethod();
 
         try {
+            if (ruta.equals("/mascota.png")
+                    && metodo.equals("GET")) {
+
+                mostrarMascota(intercambio);
+                return;
+            }
+
             if (controlarAcceso(intercambio, ruta, metodo)) {
                 return;
             }      
@@ -317,12 +324,82 @@ public class ServidorWeb {
                 "estado"
         );
 
-        controlador.agregarMiembro(
-                datos.get("nombre"),
-                datos.get("correo"),
-                datos.get("carne"),
-                datos.get("estado")
-        );
+        try {
+            controlador.agregarMiembro(
+                    datos.get("nombre"),
+                    datos.get("correo"),
+                    datos.get("carne"),
+                    datos.get("estado")
+            );
+
+        } catch (java.sql.SQLException error) {
+            String detalle = error.getMessage();
+            String mensaje;
+
+            if (detalle != null
+                    && detalle.contains(
+                            "UNIQUE constraint failed: estudiantes.carne"
+                    )) {
+
+                mensaje = "Ya existe un miembro con ese carné.";
+
+            } else if (detalle != null
+                    && detalle.contains(
+                            "UNIQUE constraint failed: estudiantes.correo"
+                    )) {
+
+                mensaje = "Ese correo ya está registrado.";
+
+            } else {
+                throw error;
+            }
+
+            enviar(
+                    intercambio,
+                    409,
+                    """
+                    <!DOCTYPE html>
+                    <html lang="es">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport"
+                              content="width=device-width, initial-scale=1">
+                        <title>Revisar datos | Voces del Valle</title>
+                    </head>
+                    <body style="margin:0;padding:30px 20px;
+                                 background:#f2f5f3;color:#263238;
+                                 font-family:'Times New Roman',serif;">
+                        <main style="max-width:600px;margin:30px auto;
+                                     padding:24px;background:white;
+                                     border-left:6px solid #184d35;
+                                     border-radius:12px;">
+                            <h1 style="color:#184d35;">
+                                No se pudo agregar al miembro
+                            </h1>
+                            <p>
+                    """
+                    + mensaje
+                    + """
+                            </p>
+                            <p>Revisa los miembros registrados antes
+                               de intentar agregarlo nuevamente.</p>
+
+                            <a href="/datos"
+                               style="color:#184d35;">
+                                Ver miembros registrados
+                            </a>
+                            <br><br>
+                            <a href="/" style="color:#184d35;">
+                                Volver al inicio
+                            </a>
+                        </main>
+                    </body>
+                    </html>
+                    """
+            );
+
+            return;
+        }
 
         redireccionar(
                 intercambio,
@@ -472,10 +549,10 @@ public class ServidorWeb {
                     <title>Datos del club</title>
                     <style>
                         :root {
-                            --verde: #009444;
-                            --dorado: #32720b;
-                            --gris: #5d7079;
-                            --fondo: #eef1f2;
+                                --verde: #28734f;
+                                --dorado: #dce9df;
+                                --gris: #184d35;
+                                --fondo: #f2f5f3;
                         }
 
                         * {
@@ -484,9 +561,9 @@ public class ServidorWeb {
 
                         body {
                             margin: 0;
-                            font-family: Arial, sans-serif;
+                            font-family: 'Times New Roman', Times, serif;
                             background: var(--fondo);
-                            color: #485054;
+                            color: #263238;
                         }
 
                         header {
@@ -541,7 +618,7 @@ public class ServidorWeb {
                         }
 
                         tr:nth-child(even) {
-                            background: #f4f6f6;
+                            background: var(--fondo);
                         }
 
                         h2 {
@@ -1226,4 +1303,35 @@ public class ServidorWeb {
                 cuenta.esCoordinador() ? "/" : "/miembro"
         );
     }
+    private static void mostrarMascota(
+            HttpExchange intercambio
+    ) throws IOException {
+
+        Path archivo = Path.of("html", "mascota.png");
+
+        if (!Files.exists(archivo)) {
+            enviar(
+                    intercambio,
+                    404,
+                    "<h1>No se encontró la mascota</h1>"
+            );
+            return;
+        }
+
+        byte[] imagen = Files.readAllBytes(archivo);
+
+        intercambio.getResponseHeaders().set(
+                "Content-Type",
+                "image/png"
+        );
+
+        intercambio.sendResponseHeaders(200, imagen.length);
+
+        try (var salida = intercambio.getResponseBody()) {
+            salida.write(imagen);
+        } finally {
+            intercambio.close();
+        }
+    }
+
 }
